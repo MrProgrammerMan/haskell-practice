@@ -37,4 +37,39 @@ qsortUniq (x:xs) = qsortUniq smaller ++ [x] ++ qsortUniq bigger
     where
         smaller = [a | a <- xs, a < x]
         bigger = [b | b <- xs, b > x]
--- dublicates are removed
+-- duplicates are removed
+
+--
+
+-- 2.1
+double x = x + x
+
+quadruple x = double (double x)
+
+factorial n = Main.product [1..n]
+
+-- 2.2
+-- (2^3)*4
+-- (2*3)+(4*5)
+-- 2+(3*(4^5))
+
+-- 2.3
+n = a `div` (length xs)
+    where
+        a = 10
+        xs = [1,2,3,4,5]
+
+-- 2.4
+last ls = (reverse ls) !! 0
+
+lastAlt ls = ls !! (length ls - 1)
+
+-- 2.5
+init ls = reverse (tail (reverse ls))
+
+init2 = reverse . tail . reverse
+
+init3 = reverse . (drop 1) . reverse
+
+initAlt [x] = []
+initAlt (x:xs) = x : initAlt xs
