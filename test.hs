@@ -67,11 +67,17 @@ last ls = (reverse ls) !! 0
 lastAlt ls = ls !! (length ls - 1)
 
 -- 2.5
-init ls = reverse (tail (reverse ls))
+init [l] = []
+init (l:ls) = l : Main.init ls
+-- Old solution, produces warning: init ls = reverse (tail (reverse ls))
 
-init2 = reverse . tail . reverse
+init2 [l] = []
+init2 (l:ls) = l : init2 ls
+-- Old solution, produces warning: init2 = reverse . tail . reverse
 
-init3 = reverse . (drop 1) . reverse
+init3 [l] = []
+init3 (l:ls) = l : init3 ls
+-- Old solution, produces warnin: init3 = reverse . (drop 1) . reverse
 
 initAlt [x] = []
 initAlt (x:xs) = x : initAlt xs
@@ -81,7 +87,17 @@ a = ['a','b','c'] :: [Char]
 b = ('a','b','c') :: (Char,Char,Char)
 c = [(False,'0'), (True,'1')] :: [(Bool,Char)]
 d = ([False,True], ['0','1']) :: ([Bool],[Char])
-e = [tail,Prelude.init,reverse] :: [[a] -> [a]]
+e = [safeTail,liftMaybe Prelude.init,liftMaybe reverse] :: [[a] -> Maybe [a]]
+-- Old solution, produces warning: e = [tail,Prelude.init,reverse] :: [[a] -> [a]]
+
+-- Used to get rid of warnings in the above task
+safeTail :: [a] -> Maybe [a]
+safeTail [] = Nothing
+safeTail (x:xs) = Just xs
+
+-- Used to get rid of warnings in the above task
+liftMaybe :: (a -> b) -> (a -> Maybe b)
+liftMaybe f = Just . f
 
 -- 3.2
 bools :: [Bool]
@@ -100,8 +116,19 @@ apply :: (a -> b) -> a -> b
 apply f x = f x
 
 -- 3.3
-second :: [a] -> a
-second xs = head (tail xs)
+second :: [a] -> Maybe a
+second = (liftArgMaybe safeHead) . (safeTail)
+-- Old solution, produces warning: second xs = head (tail xs)
+
+-- Used to get rid of warnings in the above task
+safeHead :: [a] -> Maybe a
+safeHead [] = Nothing
+safeHead (x:_) = Just x
+
+-- Used to get rid of warnings in the above task
+liftArgMaybe :: (a -> Maybe b) -> Maybe a -> Maybe b
+liftArgMaybe _ Nothing = Nothing
+liftArgMaybe f (Just x) = f x
 
 swap :: (a,b) -> (b,a)
 swap (x,y) = (y,x)
