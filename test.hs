@@ -150,3 +150,81 @@ twice f x = f (f x)
 
 -- 3.5
 -- For most types a, there are infinitely many functions that return an a. To check this equality, you would need to check every possible argument. In the case that the return type is a singleton, or the parameter type is simple enough to check all inputs, you could technically define equality.
+
+-- 4.1
+halve :: [a] -> ([a],[a])
+halve xs = (take half xs, drop half xs)
+    where
+        half = length xs `div` 2
+
+-- 4.2
+-- a
+third :: [a] -> Maybe a
+third xs = safeTail xs >>= safeTail >>= safeHead -- This is the better way(Maybe is a monad). safeTail can fail, so it returns the monad m. That means the result can be composed(unpacked and stuffed) into safeTail again with >>=. Again for safeHead. Crazy stuff...
+-- My own solution composing a safe `third`: third = (liftArgMaybe safeHead) . (liftArgMaybe safeTail) . safeTail
+-- Old solution, causes warning: third = head . tail . tail
+
+--b (partial??? throws on lists shorter than 3)
+third2 :: [a] -> a
+third2 ls = ls !! 2
+
+--c (partial)
+third3 :: [a] -> a
+third3 (_:_:x:_) = x
+
+-- 4.3
+-- a
+safetail :: [a] -> [a]
+safetail xs = if null xs then [] else tail xs
+
+-- b
+safetail2 :: [a] -> [a]
+safetail2 xs
+    | null xs = []
+    | otherwise = tail xs
+
+-- c
+safetail3 :: [a] -> [a]
+safetail3 [] = []
+safetail3 (_:xs) = xs
+
+-- 4.4
+(|||) :: Bool -> Bool -> Bool
+False ||| False = False
+_ ||| _ = True
+
+(||||) :: Bool -> Bool -> Bool
+True |||| _ = True
+False |||| b = b
+
+(|||||) :: Bool -> Bool -> Bool
+False ||||| False = False
+True ||||| True = True
+True ||||| False = True
+False ||||| True = True
+
+(||||||) :: Bool -> Bool -> Bool
+b |||||| c
+    | b == False && c == False = False
+    | otherwise = True
+
+-- 4.5
+(&&&) :: Bool -> Bool -> Bool
+a &&& b = if a then if b then True else False else False
+
+-- 4.6
+(&&&&) :: Bool -> Bool -> Bool
+a &&&& b = if a then b else False
+
+-- 4.7
+mult :: Int -> Int -> Int -> Int
+mult = \x -> \y -> \z -> x*y*z
+
+-- 4.8
+luhnDouble :: Int -> Int
+luhnDouble x
+    | x > 4 = x*2-9
+    | otherwise = x*2
+
+luhn :: Int -> Int -> Int -> Int -> Bool
+luhn a b c d = (luhnDouble a + b + luhnDouble c + d) `mod` 10 == 0
