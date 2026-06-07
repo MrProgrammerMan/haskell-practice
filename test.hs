@@ -1,3 +1,5 @@
+import Data.Char
+
 -- Excercises
 
 -- 1.1
@@ -228,3 +230,68 @@ luhnDouble x
 
 luhn :: Int -> Int -> Int -> Int -> Bool
 luhn a b c d = (luhnDouble a + b + luhnDouble c + d) `mod` 10 == 0
+
+-- 5.1
+fiveOne = sum [x*x | x <- [1..100]]
+
+-- 5.2
+grid :: Int -> Int -> [(Int,Int)]
+grid m n = [(x,y) | x <- [0..m], y <- [0..n]]
+
+-- 5.3
+square :: Int -> [(Int,Int)]
+square n = [(x,y) | (x,y) <- grid n n, x /= y]
+
+-- 5.4
+replicate :: Int -> a -> [a]
+replicate n val = [val | _ <- [1..n]]
+
+-- 5.5
+pyths :: Int -> [(Int,Int,Int)]
+pyths n = [(x,y,z) | x <- [1..n], y <- [1..n], z <- [1..n], x^2+y^2==z^2]
+
+-- 5.6
+factors :: Int -> [Int]
+factors n = [x | x <- [1..n], n `mod` x == 0]
+
+perfects :: Int -> [Int]
+perfects n = [x | x <- [1..n], 2*x == sum (factors x)]
+
+-- 5.7
+fiveSevenRef :: [(Int,Int)]
+fiveSevenRef = concat [[(x,y) | y <- [3,4]] | x <- [1,2]]
+
+-- 5.8
+positions :: Eq a => a -> [a] -> [Int]
+positions n xs = [i | (i, x) <- zip [0..] xs, x == n]
+
+find :: Eq a => a -> [(a,b)] -> [b]
+find k t = [v | (k', v) <- t, k == k']
+
+positions2 :: Eq a => a -> [a] -> [Int]
+positions2 n xs = find n (zip xs [0..])
+
+-- 5.9
+scalarproduct :: [Int] -> [Int] -> Int
+scalarproduct xs ys = sum [x*y | (x,y) <- zip xs ys]
+
+-- 5.10
+let2int :: Char -> Int
+let2int c = ord c - ord 'a'
+
+int2let :: Int -> Char
+int2let n = chr (ord 'a' + n)
+
+let2intUpper :: Char -> Int
+let2intUpper c = ord c - ord 'A'
+
+int2letUpper :: Int -> Char
+int2letUpper n = chr (ord 'A' + n)
+
+shift :: Int -> Char -> Char
+shift n c | isLower c = int2let ((let2int c + n) `mod` 26)
+          | isUpper c = int2letUpper ((let2intUpper c + n) `mod` 26)
+          | otherwise = c
+
+encode :: Int -> String -> String
+encode n xs = [shift n x | x <- xs]
