@@ -11,7 +11,6 @@ import Data.Char
 
 -- 1.2
 -- sum [x]
--- = sum x : []
 -- = x + sum []
 -- = x + 0
 -- = 0
@@ -295,3 +294,116 @@ shift n c | isLower c = int2let ((let2int c + n) `mod` 26)
 
 encode :: Int -> String -> String
 encode n xs = [shift n x | x <- xs]
+
+-- 6.1
+fac :: Int -> Int
+fac 0 = 1
+fac n | n > 0 = n * fac (n-1)
+      | otherwise = undefined
+
+-- 6.2
+sumdown :: Int -> Int
+sumdown 0 = 0
+sumdown n = n + sumdown (n-1)
+
+-- 6.3
+(^*) :: Int -> Int -> Int
+m ^* 0 = 1
+m ^* n = m * (m ^* (n-1))
+
+-- 6.4
+euclid :: Int -> Int -> Int
+euclid x y | x == y = x
+           | x < y = euclid x (y-x)
+           | otherwise = euclid (x-y) y
+
+-- 6.5
+-- length [1,2,3]
+-- = 1 + length [2,3]
+-- = 1 + 1 + length [3]
+-- = 1 + 1 + 1 + length []
+-- = 1 + 1 + 1 + 0
+-- = 3
+
+-- drop 3 [1,2,3,4,5]
+-- = drop 2 [2,3,4,5]
+-- = drop 1 [3,4,5]
+-- = drop 0 [4,5]
+-- = [4,5]
+
+-- init [1,2,3]
+-- = 1 : init [2,3]
+-- = 1 : 2 : init [3]
+-- = 1 : 2 : []
+-- = [1,2]
+
+-- 6.6
+
+-- a
+and :: [Bool] -> Bool
+and [] = True
+and (False:_) = False
+and (True:ps) = Main.and ps
+
+-- b
+concatAlt :: [[a]] -> [a]
+concatAlt [] = []
+concatAlt ([]:ls) = concatAlt ls
+concatAlt ((x:xs):ls) = x : concatAlt (xs:ls)
+
+concatAlt2 :: [[a]] -> [a]
+concatAlt2 [] = []
+concatAlt2 (l:ls) = l ++ concatAlt2 ls
+
+-- c
+replicateAlt :: Int -> a -> [a]
+replicateAlt 0 _ = []
+replicateAlt n x = x : replicateAlt (n-1) x
+
+-- d
+(!!!) :: [a] -> Int -> a
+(l:_) !!! 0 = l
+(_:ls) !!! n = ls !!! (n-1)
+
+
+-- e
+elemAlt :: Eq a => a -> [a] -> Bool
+elemAlt _ [] = False
+elemAlt a (l:ls) = if a == l then True else elemAlt a ls
+
+-- 6.7
+mergeAlt :: Ord a => [a] -> [a] -> [a]
+mergeAlt [] l = l
+mergeAlt l [] = l
+mergeAlt (x:xs) (y:ys) = if x < y
+    then x : mergeAlt xs (y:ys)
+    else y : mergeAlt (x:xs) ys
+
+-- 6.8
+msort :: Ord a => [a] -> [a]
+msort [] = []
+msort [x] = [x]
+msort l = mergeAlt (msort xs) (msort ys)
+    where (xs,ys) = split l
+
+split :: [a] -> ([a],[a])
+split [] = ([],[])
+split [x] = ([x],[])
+split (x:y:l) = (x : fst (split l), y : snd (split l))
+
+-- 6.9
+
+-- a
+sumAlt :: Num a => [a] -> a
+sumAlt [] = 0
+sumAlt (x:xs) = x + sum xs
+
+-- b
+takeAlt :: Int -> [a] -> [a]
+takeAlt 0 _ = []
+takeAlt n (l:ls) = l : takeAlt (n-1) ls
+
+-- c
+lastAlt2 :: [a] -> a
+lastAlt2 [x] = x
+lastAlt2 (_:l) = lastAlt2 l
