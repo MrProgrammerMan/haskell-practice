@@ -1,4 +1,5 @@
 import Data.Char
+import Data.List.NonEmpty (unfold)
 
 -- Excercises
 
@@ -407,3 +408,75 @@ takeAlt n (l:ls) = l : takeAlt (n-1) ls
 lastAlt2 :: [a] -> a
 lastAlt2 [x] = x
 lastAlt2 (_:l) = lastAlt2 l
+
+-- 7.1
+process xs f p = [f x | x <- xs, p x]
+processAlt xs f p = map f (filter p xs)
+processPointFree = \f p -> map f . filter p
+
+-- 7.2
+-- a
+all' :: (a -> Bool) -> [a] -> Bool
+all' _ [] = True
+all' p (x:xs) = if p x then all' p xs else False
+
+all'' :: (a -> Bool) -> [a] -> Bool
+all'' p = foldr (\x acc -> p x && acc) True
+
+-- b
+any' :: (a -> Bool) -> [a] -> Bool
+any' p = foldr (\x acc -> p x || acc) False
+
+-- c
+takeWhile' :: (a -> Bool) -> [a] -> [a]
+takeWhile' _ [] = []
+takeWhile' p (x:xs) = if p x then x : takeWhile' p xs else []
+
+takeWhile'' :: (a -> Bool) -> [a] -> [a]
+takeWhile'' p = foldr (\x acc -> if p x then x : acc else []) []
+
+-- d
+dropWhile' :: (a -> Bool) -> [a] -> [a]
+dropWhile' _ [] = []
+dropWhile' p (x:xs) = if p x then dropWhile' p xs else (x:xs)
+
+-- 7.3
+map' :: (a -> b) -> [a] -> [b]
+map' f = foldr (\x acc -> f x : acc) []
+
+filter' :: (a -> Bool) -> [a] -> [a]
+filter' p = foldr (\x acc -> if p x then x : acc else acc) []
+
+-- 7.4
+dec2int :: [Int] -> Int
+dec2int = foldl (\x acc -> x * 10 + acc) 0
+
+-- 7.5
+curry' :: ((a,b) -> c) -> a -> b -> c
+curry' f = \x -> \y -> f (x, y)
+
+uncurry' :: (a -> b -> c) -> (a,b) -> c
+uncurry' f = \(x,y) -> f x y
+
+-- 7.6
+type Bit = Int
+
+unfold' p h t x | p x       = []
+                | otherwise = h x : unfold' p h t (t x)
+
+chop8 :: [Bit] -> [[Bit]]
+chop8 = unfold' null (take 8) (drop 8)
+
+map'' :: (a -> b) -> [a] -> [b]
+map'' f = unfold' null (f . head) tail
+
+iterate' :: (a -> a) -> a -> [a]
+iterate' f = unfold' (\_ -> False) id f
+
+-- 7.7
+
+-- 7.8
+
+-- 7.9
+
+-- 7.10
