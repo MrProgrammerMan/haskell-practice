@@ -293,8 +293,8 @@ shift n c | isLower c = int2let ((let2int c + n) `mod` 26)
           | isUpper c = int2letUpper ((let2intUpper c + n) `mod` 26)
           | otherwise = c
 
-encode :: Int -> String -> String
-encode n xs = [shift n x | x <- xs]
+encode' :: Int -> String -> String
+encode' n xs = [shift n x | x <- xs]
 
 -- 6.1
 fac :: Int -> Int
@@ -474,9 +474,70 @@ iterate' :: (a -> a) -> a -> [a]
 iterate' f = unfold' (\_ -> False) id f
 
 -- 7.7
+bin2int :: [Bit] -> Int
+bin2int = foldr (\x y -> x + 2*y) 0
+
+int2bin :: Int -> [Bit]
+int2bin 0 = []
+int2bin n = n `mod` 2 : int2bin (n `div` 2)
+
+make8 :: [Bit] -> [Bit]
+make8 bits = take 8 (bits ++ repeat 0)
+
+encode :: String -> [Bit]
+encode = concat . map (make8 . int2bin . ord)
+
+decode :: [Bit] -> String
+decode = map (chr . bin2int) . chop8
+
+transmit :: String -> String
+transmit = decode . channel . encode
+
+channel :: [Bit] -> [Bit]
+channel = id
+
+encodeWithParity :: String -> [Bit]
+encodeWithParity = concat . map (addParityBit . make8 . int2bin . ord)
+
+addParityBit :: [Bit] -> [Bit]
+addParityBit l = sum l `mod` 2 : l
+
+decodeWithParity :: [Bit] -> String
+decodeWithParity = map (chr . bin2int) . checkParities . chop9
+
+chop9 :: [Bit] -> [[Bit]]
+chop9 = unfold' null (take 9) (drop 9)
+
+checkParity' :: [[Bit]] -> [[Bit]]
+checkParity' [] = []
+checkParity' ((p:bits):bytes) = if p == sum bits `mod` 2 then bits : checkParity' bytes else error "Parity bit does not match. Impossible to decode" 
+
+checkParities :: [[Bit]] -> [[Bit]]
+checkParities = map checkParity
+
+checkParity :: [Bit] -> [Bit]
+checkParity (p:bits) | p == sum bits `mod` 2 = bits
+                     | otherwise = error "Parity bit does not match. Impossible to decode"
+
+transmitWithParity :: String -> String
+transmitWithParity = decodeWithParity . channel . encodeWithParity
 
 -- 7.8
+faultyChannel :: [Bit] -> [Bit]
+faultyChannel = tail
+
+faultyTransmit :: String -> String
+faultyTransmit = decode . faultyChannel . encode
+
+faultyTransmitWithParity :: String -> String
+faultyTransmitWithParity = decodeWithParity . faultyChannel . encodeWithParity
 
 -- 7.9
+altMap :: (a -> b) -> (a -> b) -> [a] -> [b]
+altMap _ _ [] = []
+altMap f g (l:ls) = f l : altMap g f ls
 
 -- 7.10
+luhn' :: [Int] -> Bool
+luhn' = (==0) . (`mod` 10) . sum . (altMap luhnDouble id)
+
