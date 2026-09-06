@@ -1,0 +1,3 @@
+-- For most types a, there are infinitely many functions that return an a.
+-- To check this equality, you would need to check every possible argument.
+-- In the case that the return type is a singleton, or the parameter type is simple enough to check all inputs, you could technically define equality.
